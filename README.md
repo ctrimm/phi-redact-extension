@@ -10,6 +10,17 @@ of the [phi-redact SDK](https://github.com/ctrimm/phi-redact-sdk)
 (rules layer, BIOES decoding, merge policy, and placeholder scheme are
 ports of the SDK's code; see `DECISION_LOG.md`).
 
+## Demo
+
+[![phi-redact Upload Guard intercepting an upload of a fake clinical note](docs/demo-poster.png)](docs/demo.mp4)
+
+A 12-second recording ([docs/demo.mp4](docs/demo.mp4)): a fake clinical
+note is attached to a file input, the guard pauses the upload and lists
+12 detected identifiers, and the page receives a redacted copy —
+`fake-note.redacted.txt` with placeholders like `[NAME_PATIENT_1]` and
+`[SSN_1]`. The one-time model download is not shown. Filmed on the
+bundled test page (`test/upload-test.html`); all data is fake.
+
 ## What it does
 
 When you start an upload — choosing files in a file input, dropping
