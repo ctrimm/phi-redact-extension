@@ -1,0 +1,2802 @@
+{
+ "tokenizer": {
+  "note_basic": {
+   "text": "Patient John Smith, DOB 03/14/1962, was seen at Mercy General Hospital. SSN 123-45-6789. Call (312) 555-0167 or email jsmith@example.com. Card on file: 4111 1111 1111 1111.",
+   "ids": [
+    101,
+    5776,
+    2198,
+    3044,
+    1010,
+    2079,
+    2497,
+    6021,
+    1013,
+    2403,
+    1013,
+    3705,
+    1010,
+    2001,
+    2464,
+    2012,
+    8673,
+    2236,
+    2902,
+    1012,
+    7020,
+    2078,
+    13138,
+    1011,
+    3429,
+    1011,
+    6163,
+    2620,
+    2683,
+    1012,
+    2655,
+    1006,
+    21036,
+    1007,
+    29541,
+    1011,
+    5890,
+    2575,
+    2581,
+    2030,
+    10373,
+    1046,
+    21405,
+    1030,
+    2742,
+    1012,
+    4012,
+    1012,
+    4003,
+    2006,
+    5371,
+    1024,
+    27517,
+    2487,
+    11118,
+    2487,
+    11118,
+    2487,
+    11118,
+    2487,
+    1012,
+    102
+   ],
+   "offsets": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     7
+    ],
+    [
+     8,
+     12
+    ],
+    [
+     13,
+     18
+    ],
+    [
+     18,
+     19
+    ],
+    [
+     20,
+     22
+    ],
+    [
+     22,
+     23
+    ],
+    [
+     24,
+     26
+    ],
+    [
+     26,
+     27
+    ],
+    [
+     27,
+     29
+    ],
+    [
+     29,
+     30
+    ],
+    [
+     30,
+     34
+    ],
+    [
+     34,
+     35
+    ],
+    [
+     36,
+     39
+    ],
+    [
+     40,
+     44
+    ],
+    [
+     45,
+     47
+    ],
+    [
+     48,
+     53
+    ],
+    [
+     54,
+     61
+    ],
+    [
+     62,
+     70
+    ],
+    [
+     70,
+     71
+    ],
+    [
+     72,
+     74
+    ],
+    [
+     74,
+     75
+    ],
+    [
+     76,
+     79
+    ],
+    [
+     79,
+     80
+    ],
+    [
+     80,
+     82
+    ],
+    [
+     82,
+     83
+    ],
+    [
+     83,
+     85
+    ],
+    [
+     85,
+     86
+    ],
+    [
+     86,
+     87
+    ],
+    [
+     87,
+     88
+    ],
+    [
+     89,
+     93
+    ],
+    [
+     94,
+     95
+    ],
+    [
+     95,
+     98
+    ],
+    [
+     98,
+     99
+    ],
+    [
+     100,
+     103
+    ],
+    [
+     103,
+     104
+    ],
+    [
+     104,
+     106
+    ],
+    [
+     106,
+     107
+    ],
+    [
+     107,
+     108
+    ],
+    [
+     109,
+     111
+    ],
+    [
+     112,
+     117
+    ],
+    [
+     118,
+     119
+    ],
+    [
+     119,
+     124
+    ],
+    [
+     124,
+     125
+    ],
+    [
+     125,
+     132
+    ],
+    [
+     132,
+     133
+    ],
+    [
+     133,
+     136
+    ],
+    [
+     136,
+     137
+    ],
+    [
+     138,
+     142
+    ],
+    [
+     143,
+     145
+    ],
+    [
+     146,
+     150
+    ],
+    [
+     150,
+     151
+    ],
+    [
+     152,
+     155
+    ],
+    [
+     155,
+     156
+    ],
+    [
+     157,
+     160
+    ],
+    [
+     160,
+     161
+    ],
+    [
+     162,
+     165
+    ],
+    [
+     165,
+     166
+    ],
+    [
+     167,
+     170
+    ],
+    [
+     170,
+     171
+    ],
+    [
+     171,
+     172
+    ],
+    [
+     0,
+     0
+    ]
+   ]
+  },
+  "caps_accents": {
+   "text": "JOS\u00c9 GARC\u00cdA was admitted. Dr. O'Brien-Smith prescribed medication. MRN 1234567. Address: 4210 Wacker Dr, Chicago, IL 60601.",
+   "ids": [
+    101,
+    4560,
+    7439,
+    2001,
+    4914,
+    1012,
+    2852,
+    1012,
+    1051,
+    1005,
+    9848,
+    1011,
+    3044,
+    16250,
+    14667,
+    1012,
+    2720,
+    2078,
+    13138,
+    19961,
+    2575,
+    2581,
+    1012,
+    4769,
+    1024,
+    29403,
+    2692,
+    11333,
+    9102,
+    2852,
+    1010,
+    3190,
+    1010,
+    6335,
+    3438,
+    16086,
+    2487,
+    1012,
+    102
+   ],
+   "offsets": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     4
+    ],
+    [
+     5,
+     11
+    ],
+    [
+     12,
+     15
+    ],
+    [
+     16,
+     24
+    ],
+    [
+     24,
+     25
+    ],
+    [
+     26,
+     28
+    ],
+    [
+     28,
+     29
+    ],
+    [
+     30,
+     31
+    ],
+    [
+     31,
+     32
+    ],
+    [
+     32,
+     37
+    ],
+    [
+     37,
+     38
+    ],
+    [
+     38,
+     43
+    ],
+    [
+     44,
+     54
+    ],
+    [
+     55,
+     65
+    ],
+    [
+     65,
+     66
+    ],
+    [
+     67,
+     69
+    ],
+    [
+     69,
+     70
+    ],
+    [
+     71,
+     74
+    ],
+    [
+     74,
+     76
+    ],
+    [
+     76,
+     77
+    ],
+    [
+     77,
+     78
+    ],
+    [
+     78,
+     79
+    ],
+    [
+     80,
+     87
+    ],
+    [
+     87,
+     88
+    ],
+    [
+     89,
+     92
+    ],
+    [
+     92,
+     93
+    ],
+    [
+     94,
+     96
+    ],
+    [
+     96,
+     100
+    ],
+    [
+     101,
+     103
+    ],
+    [
+     103,
+     104
+    ],
+    [
+     105,
+     112
+    ],
+    [
+     112,
+     113
+    ],
+    [
+     114,
+     116
+    ],
+    [
+     117,
+     119
+    ],
+    [
+     119,
+     121
+    ],
+    [
+     121,
+     122
+    ],
+    [
+     122,
+     123
+    ],
+    [
+     0,
+     0
+    ]
+   ]
+  },
+  "clean": {
+   "text": "The patient reports mild seasonal allergies and takes a daily multivitamin. Follow up in six months.",
+   "ids": [
+    101,
+    1996,
+    5776,
+    4311,
+    10256,
+    12348,
+    2035,
+    2121,
+    17252,
+    1998,
+    3138,
+    1037,
+    3679,
+    4800,
+    28403,
+    10020,
+    1012,
+    3582,
+    2039,
+    1999,
+    2416,
+    2706,
+    1012,
+    102
+   ],
+   "offsets": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     3
+    ],
+    [
+     4,
+     11
+    ],
+    [
+     12,
+     19
+    ],
+    [
+     20,
+     24
+    ],
+    [
+     25,
+     33
+    ],
+    [
+     34,
+     37
+    ],
+    [
+     37,
+     39
+    ],
+    [
+     39,
+     43
+    ],
+    [
+     44,
+     47
+    ],
+    [
+     48,
+     53
+    ],
+    [
+     54,
+     55
+    ],
+    [
+     56,
+     61
+    ],
+    [
+     62,
+     67
+    ],
+    [
+     67,
+     71
+    ],
+    [
+     71,
+     74
+    ],
+    [
+     74,
+     75
+    ],
+    [
+     76,
+     82
+    ],
+    [
+     83,
+     85
+    ],
+    [
+     86,
+     88
+    ],
+    [
+     89,
+     92
+    ],
+    [
+     93,
+     99
+    ],
+    [
+     99,
+     100
+    ],
+    [
+     0,
+     0
+    ]
+   ]
+  },
+  "long": {
+   "text": "Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Her phone is 415-555-0132 and she lives at 88 King Street, Springfield, IL 62704. Insurance member ID on file.",
+   "ids": [
+    101,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    10121,
+    3591,
+    2007,
+    10821,
+    1012,
+    5776,
+    3814,
+    102
+   ],
+   "offsets": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     7
+    ],
+    [
+     8,
+     13
+    ],
+    [
+     14,
+     22
+    ],
+    [
+     23,
+     32
+    ],
+    [
+     33,
+     37
+    ],
+    [
+     38,
+     48
+    ],
+    [
+     48,
+     49
+    ],
+    [
+     50,
+     57
+    ],
+    [
+     58,
+     63
+    ],
+    [
+     64,
+     72
+    ],
+    [
+     73,
+     82
+    ],
+    [
+     83,
+     87
+    ],
+    [
+     88,
+     98
+    ],
+    [
+     98,
+     99
+    ],
+    [
+     100,
+     107
+    ],
+    [
+     108,
+     113
+    ],
+    [
+     114,
+     122
+    ],
+    [
+     123,
+     132
+    ],
+    [
+     133,
+     137
+    ],
+    [
+     138,
+     148
+    ],
+    [
+     148,
+     149
+    ],
+    [
+     150,
+     157
+    ],
+    [
+     158,
+     163
+    ],
+    [
+     164,
+     172
+    ],
+    [
+     173,
+     182
+    ],
+    [
+     183,
+     187
+    ],
+    [
+     188,
+     198
+    ],
+    [
+     198,
+     199
+    ],
+    [
+     200,
+     207
+    ],
+    [
+     208,
+     213
+    ],
+    [
+     214,
+     222
+    ],
+    [
+     223,
+     232
+    ],
+    [
+     233,
+     237
+    ],
+    [
+     238,
+     248
+    ],
+    [
+     248,
+     249
+    ],
+    [
+     250,
+     257
+    ],
+    [
+     258,
+     263
+    ],
+    [
+     264,
+     272
+    ],
+    [
+     273,
+     282
+    ],
+    [
+     283,
+     287
+    ],
+    [
+     288,
+     298
+    ],
+    [
+     298,
+     299
+    ],
+    [
+     300,
+     307
+    ],
+    [
+     308,
+     313
+    ],
+    [
+     314,
+     322
+    ],
+    [
+     323,
+     332
+    ],
+    [
+     333,
+     337
+    ],
+    [
+     338,
+     348
+    ],
+    [
+     348,
+     349
+    ],
+    [
+     350,
+     357
+    ],
+    [
+     358,
+     363
+    ],
+    [
+     364,
+     372
+    ],
+    [
+     373,
+     382
+    ],
+    [
+     383,
+     387
+    ],
+    [
+     388,
+     398
+    ],
+    [
+     398,
+     399
+    ],
+    [
+     400,
+     407
+    ],
+    [
+     408,
+     413
+    ],
+    [
+     414,
+     422
+    ],
+    [
+     423,
+     432
+    ],
+    [
+     433,
+     437
+    ],
+    [
+     438,
+     448
+    ],
+    [
+     448,
+     449
+    ],
+    [
+     450,
+     457
+    ],
+    [
+     458,
+     463
+    ],
+    [
+     464,
+     472
+    ],
+    [
+     473,
+     482
+    ],
+    [
+     483,
+     487
+    ],
+    [
+     488,
+     498
+    ],
+    [
+     498,
+     499
+    ],
+    [
+     500,
+     507
+    ],
+    [
+     508,
+     513
+    ],
+    [
+     514,
+     522
+    ],
+    [
+     523,
+     532
+    ],
+    [
+     533,
+     537
+    ],
+    [
+     538,
+     548
+    ],
+    [
+     548,
+     549
+    ],
+    [
+     550,
+     557
+    ],
+    [
+     558,
+     563
+    ],
+    [
+     564,
+     572
+    ],
+    [
+     573,
+     582
+    ],
+    [
+     583,
+     587
+    ],
+    [
+     588,
+     598
+    ],
+    [
+     598,
+     599
+    ],
+    [
+     600,
+     607
+    ],
+    [
+     608,
+     613
+    ],
+    [
+     614,
+     622
+    ],
+    [
+     623,
+     632
+    ],
+    [
+     633,
+     637
+    ],
+    [
+     638,
+     648
+    ],
+    [
+     648,
+     649
+    ],
+    [
+     650,
+     657
+    ],
+    [
+     658,
+     663
+    ],
+    [
+     664,
+     672
+    ],
+    [
+     673,
+     682
+    ],
+    [
+     683,
+     687
+    ],
+    [
+     688,
+     698
+    ],
+    [
+     698,
+     699
+    ],
+    [
+     700,
+     707
+    ],
+    [
+     708,
+     713
+    ],
+    [
+     714,
+     722
+    ],
+    [
+     723,
+     732
+    ],
+    [
+     733,
+     737
+    ],
+    [
+     738,
+     748
+    ],
+    [
+     748,
+     749
+    ],
+    [
+     750,
+     757
+    ],
+    [
+     758,
+     763
+    ],
+    [
+     764,
+     772
+    ],
+    [
+     773,
+     782
+    ],
+    [
+     783,
+     787
+    ],
+    [
+     788,
+     798
+    ],
+    [
+     798,
+     799
+    ],
+    [
+     800,
+     807
+    ],
+    [
+     808,
+     813
+    ],
+    [
+     814,
+     822
+    ],
+    [
+     823,
+     832
+    ],
+    [
+     833,
+     837
+    ],
+    [
+     838,
+     848
+    ],
+    [
+     848,
+     849
+    ],
+    [
+     850,
+     857
+    ],
+    [
+     858,
+     863
+    ],
+    [
+     864,
+     872
+    ],
+    [
+     873,
+     882
+    ],
+    [
+     883,
+     887
+    ],
+    [
+     888,
+     898
+    ],
+    [
+     898,
+     899
+    ],
+    [
+     900,
+     907
+    ],
+    [
+     908,
+     913
+    ],
+    [
+     914,
+     922
+    ],
+    [
+     923,
+     932
+    ],
+    [
+     933,
+     937
+    ],
+    [
+     938,
+     948
+    ],
+    [
+     948,
+     949
+    ],
+    [
+     950,
+     957
+    ],
+    [
+     958,
+     963
+    ],
+    [
+     964,
+     972
+    ],
+    [
+     973,
+     982
+    ],
+    [
+     983,
+     987
+    ],
+    [
+     988,
+     998
+    ],
+    [
+     998,
+     999
+    ],
+    [
+     1000,
+     1007
+    ],
+    [
+     1008,
+     1013
+    ],
+    [
+     1014,
+     1022
+    ],
+    [
+     1023,
+     1032
+    ],
+    [
+     1033,
+     1037
+    ],
+    [
+     1038,
+     1048
+    ],
+    [
+     1048,
+     1049
+    ],
+    [
+     1050,
+     1057
+    ],
+    [
+     1058,
+     1063
+    ],
+    [
+     1064,
+     1072
+    ],
+    [
+     1073,
+     1082
+    ],
+    [
+     1083,
+     1087
+    ],
+    [
+     1088,
+     1098
+    ],
+    [
+     1098,
+     1099
+    ],
+    [
+     1100,
+     1107
+    ],
+    [
+     1108,
+     1113
+    ],
+    [
+     1114,
+     1122
+    ],
+    [
+     1123,
+     1132
+    ],
+    [
+     1133,
+     1137
+    ],
+    [
+     1138,
+     1148
+    ],
+    [
+     1148,
+     1149
+    ],
+    [
+     1150,
+     1157
+    ],
+    [
+     1158,
+     1163
+    ],
+    [
+     1164,
+     1172
+    ],
+    [
+     1173,
+     1182
+    ],
+    [
+     1183,
+     1187
+    ],
+    [
+     1188,
+     1198
+    ],
+    [
+     1198,
+     1199
+    ],
+    [
+     1200,
+     1207
+    ],
+    [
+     1208,
+     1213
+    ],
+    [
+     1214,
+     1222
+    ],
+    [
+     1223,
+     1232
+    ],
+    [
+     1233,
+     1237
+    ],
+    [
+     1238,
+     1248
+    ],
+    [
+     1248,
+     1249
+    ],
+    [
+     1250,
+     1257
+    ],
+    [
+     1258,
+     1263
+    ],
+    [
+     1264,
+     1272
+    ],
+    [
+     1273,
+     1282
+    ],
+    [
+     1283,
+     1287
+    ],
+    [
+     1288,
+     1298
+    ],
+    [
+     1298,
+     1299
+    ],
+    [
+     1300,
+     1307
+    ],
+    [
+     1308,
+     1313
+    ],
+    [
+     1314,
+     1322
+    ],
+    [
+     1323,
+     1332
+    ],
+    [
+     1333,
+     1337
+    ],
+    [
+     1338,
+     1348
+    ],
+    [
+     1348,
+     1349
+    ],
+    [
+     1350,
+     1357
+    ],
+    [
+     1358,
+     1363
+    ],
+    [
+     1364,
+     1372
+    ],
+    [
+     1373,
+     1382
+    ],
+    [
+     1383,
+     1387
+    ],
+    [
+     1388,
+     1398
+    ],
+    [
+     1398,
+     1399
+    ],
+    [
+     1400,
+     1407
+    ],
+    [
+     1408,
+     1413
+    ],
+    [
+     1414,
+     1422
+    ],
+    [
+     1423,
+     1432
+    ],
+    [
+     1433,
+     1437
+    ],
+    [
+     1438,
+     1448
+    ],
+    [
+     1448,
+     1449
+    ],
+    [
+     1450,
+     1457
+    ],
+    [
+     1458,
+     1463
+    ],
+    [
+     1464,
+     1472
+    ],
+    [
+     1473,
+     1482
+    ],
+    [
+     1483,
+     1487
+    ],
+    [
+     1488,
+     1498
+    ],
+    [
+     1498,
+     1499
+    ],
+    [
+     1500,
+     1507
+    ],
+    [
+     1508,
+     1513
+    ],
+    [
+     1514,
+     1522
+    ],
+    [
+     1523,
+     1532
+    ],
+    [
+     1533,
+     1537
+    ],
+    [
+     1538,
+     1548
+    ],
+    [
+     1548,
+     1549
+    ],
+    [
+     1550,
+     1557
+    ],
+    [
+     1558,
+     1563
+    ],
+    [
+     1564,
+     1572
+    ],
+    [
+     1573,
+     1582
+    ],
+    [
+     1583,
+     1587
+    ],
+    [
+     1588,
+     1598
+    ],
+    [
+     1598,
+     1599
+    ],
+    [
+     1600,
+     1607
+    ],
+    [
+     1608,
+     1613
+    ],
+    [
+     1614,
+     1622
+    ],
+    [
+     1623,
+     1632
+    ],
+    [
+     1633,
+     1637
+    ],
+    [
+     1638,
+     1648
+    ],
+    [
+     1648,
+     1649
+    ],
+    [
+     1650,
+     1657
+    ],
+    [
+     1658,
+     1663
+    ],
+    [
+     1664,
+     1672
+    ],
+    [
+     1673,
+     1682
+    ],
+    [
+     1683,
+     1687
+    ],
+    [
+     1688,
+     1698
+    ],
+    [
+     1698,
+     1699
+    ],
+    [
+     1700,
+     1707
+    ],
+    [
+     1708,
+     1713
+    ],
+    [
+     1714,
+     1722
+    ],
+    [
+     1723,
+     1732
+    ],
+    [
+     1733,
+     1737
+    ],
+    [
+     1738,
+     1748
+    ],
+    [
+     1748,
+     1749
+    ],
+    [
+     1750,
+     1757
+    ],
+    [
+     1758,
+     1763
+    ],
+    [
+     1764,
+     1772
+    ],
+    [
+     1773,
+     1782
+    ],
+    [
+     1783,
+     1787
+    ],
+    [
+     1788,
+     1798
+    ],
+    [
+     1798,
+     1799
+    ],
+    [
+     1800,
+     1807
+    ],
+    [
+     1808,
+     1813
+    ],
+    [
+     0,
+     0
+    ]
+   ]
+  },
+  "edge_punct": {
+   "text": "Reach out to mary.jane+clinic@example-mail.com or visit https://portal.example.org/records?id=991. IP logged: 10.0.3.250. FAX: 312.555.0143.",
+   "ids": [
+    101,
+    3362,
+    2041,
+    2000,
+    2984,
+    1012,
+    4869,
+    1009,
+    9349,
+    1030,
+    2742,
+    1011,
+    5653,
+    1012,
+    4012,
+    2030,
+    3942,
+    16770,
+    1024,
+    1013,
+    1013,
+    9445,
+    1012,
+    2742,
+    1012,
+    8917,
+    1013,
+    2636,
+    1029,
+    8909,
+    1027,
+    5585,
+    2487,
+    1012,
+    12997,
+    26618,
+    1024,
+    2184,
+    1012,
+    1014,
+    1012,
+    1017,
+    1012,
+    5539,
+    1012,
+    6904,
+    2595,
+    1024,
+    21036,
+    1012,
+    29541,
+    1012,
+    5890,
+    23777,
+    1012,
+    102
+   ],
+   "offsets": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     5
+    ],
+    [
+     6,
+     9
+    ],
+    [
+     10,
+     12
+    ],
+    [
+     13,
+     17
+    ],
+    [
+     17,
+     18
+    ],
+    [
+     18,
+     22
+    ],
+    [
+     22,
+     23
+    ],
+    [
+     23,
+     29
+    ],
+    [
+     29,
+     30
+    ],
+    [
+     30,
+     37
+    ],
+    [
+     37,
+     38
+    ],
+    [
+     38,
+     42
+    ],
+    [
+     42,
+     43
+    ],
+    [
+     43,
+     46
+    ],
+    [
+     47,
+     49
+    ],
+    [
+     50,
+     55
+    ],
+    [
+     56,
+     61
+    ],
+    [
+     61,
+     62
+    ],
+    [
+     62,
+     63
+    ],
+    [
+     63,
+     64
+    ],
+    [
+     64,
+     70
+    ],
+    [
+     70,
+     71
+    ],
+    [
+     71,
+     78
+    ],
+    [
+     78,
+     79
+    ],
+    [
+     79,
+     82
+    ],
+    [
+     82,
+     83
+    ],
+    [
+     83,
+     90
+    ],
+    [
+     90,
+     91
+    ],
+    [
+     91,
+     93
+    ],
+    [
+     93,
+     94
+    ],
+    [
+     94,
+     96
+    ],
+    [
+     96,
+     97
+    ],
+    [
+     97,
+     98
+    ],
+    [
+     99,
+     101
+    ],
+    [
+     102,
+     108
+    ],
+    [
+     108,
+     109
+    ],
+    [
+     110,
+     112
+    ],
+    [
+     112,
+     113
+    ],
+    [
+     113,
+     114
+    ],
+    [
+     114,
+     115
+    ],
+    [
+     115,
+     116
+    ],
+    [
+     116,
+     117
+    ],
+    [
+     117,
+     120
+    ],
+    [
+     120,
+     121
+    ],
+    [
+     122,
+     124
+    ],
+    [
+     124,
+     125
+    ],
+    [
+     125,
+     126
+    ],
+    [
+     127,
+     130
+    ],
+    [
+     130,
+     131
+    ],
+    [
+     131,
+     134
+    ],
+    [
+     134,
+     135
+    ],
+    [
+     135,
+     137
+    ],
+    [
+     137,
+     139
+    ],
+    [
+     139,
+     140
+    ],
+    [
+     0,
+     0
+    ]
+   ]
+  }
+ },
+ "redact": {
+  "note_basic": {
+   "text": "Patient John Smith, DOB 03/14/1962, was seen at Mercy General Hospital. SSN 123-45-6789. Call (312) 555-0167 or email jsmith@example.com. Card on file: 4111 1111 1111 1111.",
+   "entities": [
+    {
+     "start": 8,
+     "end": 12,
+     "label": "NAME_PATIENT",
+     "text": "John",
+     "source": "neural",
+     "score": 0.96,
+     "placeholder": "[NAME_PATIENT_1]"
+    },
+    {
+     "start": 13,
+     "end": 18,
+     "label": "NAME_PATIENT",
+     "text": "Smith",
+     "source": "neural",
+     "score": 0.8696,
+     "placeholder": "[NAME_PATIENT_2]"
+    },
+    {
+     "start": 24,
+     "end": 34,
+     "label": "DATE",
+     "text": "03/14/1962",
+     "source": "rule",
+     "placeholder": "[DATE_1]"
+    },
+    {
+     "start": 48,
+     "end": 70,
+     "label": "HOSPITAL",
+     "text": "Mercy General Hospital",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[HOSPITAL_1]"
+    },
+    {
+     "start": 76,
+     "end": 87,
+     "label": "SSN",
+     "text": "123-45-6789",
+     "source": "rule",
+     "placeholder": "[SSN_1]"
+    },
+    {
+     "start": 94,
+     "end": 108,
+     "label": "PHONE",
+     "text": "(312) 555-0167",
+     "source": "rule",
+     "placeholder": "[PHONE_1]"
+    },
+    {
+     "start": 118,
+     "end": 136,
+     "label": "EMAIL",
+     "text": "jsmith@example.com",
+     "source": "rule",
+     "placeholder": "[EMAIL_1]"
+    },
+    {
+     "start": 152,
+     "end": 171,
+     "label": "CREDITCARD",
+     "text": "4111 1111 1111 1111",
+     "source": "rule",
+     "placeholder": "[CREDITCARD_1]"
+    }
+   ],
+   "redacted": "Patient [NAME_PATIENT_1] [NAME_PATIENT_2], DOB [DATE_1], was seen at [HOSPITAL_1]. SSN [SSN_1]. Call [PHONE_1] or email [EMAIL_1]. Card on file: [CREDITCARD_1].",
+   "counts": {
+    "NAME_PATIENT": 2,
+    "DATE": 1,
+    "HOSPITAL": 1,
+    "SSN": 1,
+    "PHONE": 1,
+    "EMAIL": 1,
+    "CREDITCARD": 1
+   }
+  },
+  "caps_accents": {
+   "text": "JOS\u00c9 GARC\u00cdA was admitted. Dr. O'Brien-Smith prescribed medication. MRN 1234567. Address: 4210 Wacker Dr, Chicago, IL 60601.",
+   "entities": [
+    {
+     "start": 0,
+     "end": 4,
+     "label": "NAME_PATIENT",
+     "text": "JOS\u00c9",
+     "source": "neural",
+     "score": 0.9961,
+     "placeholder": "[NAME_PATIENT_1]"
+    },
+    {
+     "start": 5,
+     "end": 11,
+     "label": "NAME_PATIENT",
+     "text": "GARC\u00cdA",
+     "source": "neural",
+     "score": 0.9611,
+     "placeholder": "[NAME_PATIENT_2]"
+    },
+    {
+     "start": 26,
+     "end": 43,
+     "label": "NAME_PATIENT",
+     "text": "Dr. O'Brien-Smith",
+     "source": "neural",
+     "score": 0.8785,
+     "placeholder": "[NAME_PATIENT_3]"
+    },
+    {
+     "start": 67,
+     "end": 78,
+     "label": "MRN",
+     "text": "MRN 1234567",
+     "source": "rule",
+     "placeholder": "[MRN_1]"
+    },
+    {
+     "start": 89,
+     "end": 103,
+     "label": "ADDRESS",
+     "text": "4210 Wacker Dr",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[ADDRESS_1]"
+    },
+    {
+     "start": 105,
+     "end": 112,
+     "label": "CITY",
+     "text": "Chicago",
+     "source": "neural",
+     "score": 0.9949,
+     "placeholder": "[CITY_1]"
+    },
+    {
+     "start": 114,
+     "end": 116,
+     "label": "STATE",
+     "text": "IL",
+     "source": "neural",
+     "score": 0.9704,
+     "placeholder": "[STATE_1]"
+    },
+    {
+     "start": 117,
+     "end": 122,
+     "label": "ZIP",
+     "text": "60601",
+     "source": "rule",
+     "placeholder": "[ZIP_1]"
+    }
+   ],
+   "redacted": "[NAME_PATIENT_1] [NAME_PATIENT_2] was admitted. [NAME_PATIENT_3] prescribed medication. [MRN_1]. Address: [ADDRESS_1], [CITY_1], [STATE_1] [ZIP_1].",
+   "counts": {
+    "NAME_PATIENT": 3,
+    "MRN": 1,
+    "ADDRESS": 1,
+    "CITY": 1,
+    "STATE": 1,
+    "ZIP": 1
+   }
+  },
+  "clean": {
+   "text": "The patient reports mild seasonal allergies and takes a daily multivitamin. Follow up in six months.",
+   "entities": [],
+   "redacted": "The patient reports mild seasonal allergies and takes a daily multivitamin. Follow up in six months.",
+   "counts": {}
+  },
+  "long": {
+   "text": "Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Her phone is 415-555-0132 and she lives at 88 King Street, Springfield, IL 62704. Insurance member ID on file.",
+   "entities": [
+    {
+     "start": 8,
+     "end": 22,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_1]"
+    },
+    {
+     "start": 58,
+     "end": 72,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_2]"
+    },
+    {
+     "start": 108,
+     "end": 122,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_3]"
+    },
+    {
+     "start": 158,
+     "end": 172,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_4]"
+    },
+    {
+     "start": 208,
+     "end": 222,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_5]"
+    },
+    {
+     "start": 258,
+     "end": 272,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_6]"
+    },
+    {
+     "start": 308,
+     "end": 322,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_7]"
+    },
+    {
+     "start": 358,
+     "end": 372,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_8]"
+    },
+    {
+     "start": 408,
+     "end": 422,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_9]"
+    },
+    {
+     "start": 458,
+     "end": 472,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_10]"
+    },
+    {
+     "start": 508,
+     "end": 522,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_11]"
+    },
+    {
+     "start": 558,
+     "end": 572,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_12]"
+    },
+    {
+     "start": 608,
+     "end": 622,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_13]"
+    },
+    {
+     "start": 658,
+     "end": 672,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_14]"
+    },
+    {
+     "start": 708,
+     "end": 722,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_15]"
+    },
+    {
+     "start": 758,
+     "end": 772,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_16]"
+    },
+    {
+     "start": 808,
+     "end": 822,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_17]"
+    },
+    {
+     "start": 858,
+     "end": 872,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_18]"
+    },
+    {
+     "start": 908,
+     "end": 922,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_19]"
+    },
+    {
+     "start": 958,
+     "end": 972,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_20]"
+    },
+    {
+     "start": 1008,
+     "end": 1022,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_21]"
+    },
+    {
+     "start": 1058,
+     "end": 1072,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_22]"
+    },
+    {
+     "start": 1108,
+     "end": 1122,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_23]"
+    },
+    {
+     "start": 1158,
+     "end": 1172,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_24]"
+    },
+    {
+     "start": 1208,
+     "end": 1222,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_25]"
+    },
+    {
+     "start": 1258,
+     "end": 1272,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_26]"
+    },
+    {
+     "start": 1308,
+     "end": 1322,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_27]"
+    },
+    {
+     "start": 1358,
+     "end": 1372,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_28]"
+    },
+    {
+     "start": 1408,
+     "end": 1422,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_29]"
+    },
+    {
+     "start": 1458,
+     "end": 1472,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_30]"
+    },
+    {
+     "start": 1508,
+     "end": 1522,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_31]"
+    },
+    {
+     "start": 1558,
+     "end": 1572,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_32]"
+    },
+    {
+     "start": 1608,
+     "end": 1622,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_33]"
+    },
+    {
+     "start": 1658,
+     "end": 1672,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 0.9998,
+     "placeholder": "[NAME_PATIENT_34]"
+    },
+    {
+     "start": 1708,
+     "end": 1722,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_35]"
+    },
+    {
+     "start": 1758,
+     "end": 1772,
+     "label": "NAME_PATIENT",
+     "text": "Maria Gonzalez",
+     "source": "neural",
+     "score": 1.0,
+     "placeholder": "[NAME_PATIENT_36]"
+    },
+    {
+     "start": 1808,
+     "end": 1813,
+     "label": "NAME_PATIENT",
+     "text": "Maria",
+     "source": "neural",
+     "score": 0.8901,
+     "placeholder": "[NAME_PATIENT_37]"
+    },
+    {
+     "start": 3013,
+     "end": 3025,
+     "label": "PHONE",
+     "text": "415-555-0132",
+     "source": "rule",
+     "placeholder": "[PHONE_1]"
+    },
+    {
+     "start": 3075,
+     "end": 3080,
+     "label": "ZIP",
+     "text": "62704",
+     "source": "rule",
+     "placeholder": "[ZIP_1]"
+    }
+   ],
+   "redacted": "Patient [NAME_PATIENT_1] presented with complaints. Patient [NAME_PATIENT_2] presented with complaints. Patient [NAME_PATIENT_3] presented with complaints. Patient [NAME_PATIENT_4] presented with complaints. Patient [NAME_PATIENT_5] presented with complaints. Patient [NAME_PATIENT_6] presented with complaints. Patient [NAME_PATIENT_7] presented with complaints. Patient [NAME_PATIENT_8] presented with complaints. Patient [NAME_PATIENT_9] presented with complaints. Patient [NAME_PATIENT_10] presented with complaints. Patient [NAME_PATIENT_11] presented with complaints. Patient [NAME_PATIENT_12] presented with complaints. Patient [NAME_PATIENT_13] presented with complaints. Patient [NAME_PATIENT_14] presented with complaints. Patient [NAME_PATIENT_15] presented with complaints. Patient [NAME_PATIENT_16] presented with complaints. Patient [NAME_PATIENT_17] presented with complaints. Patient [NAME_PATIENT_18] presented with complaints. Patient [NAME_PATIENT_19] presented with complaints. Patient [NAME_PATIENT_20] presented with complaints. Patient [NAME_PATIENT_21] presented with complaints. Patient [NAME_PATIENT_22] presented with complaints. Patient [NAME_PATIENT_23] presented with complaints. Patient [NAME_PATIENT_24] presented with complaints. Patient [NAME_PATIENT_25] presented with complaints. Patient [NAME_PATIENT_26] presented with complaints. Patient [NAME_PATIENT_27] presented with complaints. Patient [NAME_PATIENT_28] presented with complaints. Patient [NAME_PATIENT_29] presented with complaints. Patient [NAME_PATIENT_30] presented with complaints. Patient [NAME_PATIENT_31] presented with complaints. Patient [NAME_PATIENT_32] presented with complaints. Patient [NAME_PATIENT_33] presented with complaints. Patient [NAME_PATIENT_34] presented with complaints. Patient [NAME_PATIENT_35] presented with complaints. Patient [NAME_PATIENT_36] presented with complaints. Patient [NAME_PATIENT_37] Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Patient Maria Gonzalez presented with complaints. Her phone is [PHONE_1] and she lives at 88 King Street, Springfield, IL [ZIP_1]. Insurance member ID on file.",
+   "counts": {
+    "NAME_PATIENT": 37,
+    "PHONE": 1,
+    "ZIP": 1
+   }
+  },
+  "edge_punct": {
+   "text": "Reach out to mary.jane+clinic@example-mail.com or visit https://portal.example.org/records?id=991. IP logged: 10.0.3.250. FAX: 312.555.0143.",
+   "entities": [
+    {
+     "start": 13,
+     "end": 46,
+     "label": "EMAIL",
+     "text": "mary.jane+clinic@example-mail.com",
+     "source": "rule",
+     "placeholder": "[EMAIL_1]"
+    },
+    {
+     "start": 56,
+     "end": 98,
+     "label": "URL",
+     "text": "https://portal.example.org/records?id=991.",
+     "source": "rule",
+     "placeholder": "[URL_1]"
+    },
+    {
+     "start": 110,
+     "end": 120,
+     "label": "IP",
+     "text": "10.0.3.250",
+     "source": "rule",
+     "placeholder": "[IP_1]"
+    },
+    {
+     "start": 127,
+     "end": 139,
+     "label": "PHONE",
+     "text": "312.555.0143",
+     "source": "rule",
+     "placeholder": "[PHONE_1]"
+    }
+   ],
+   "redacted": "Reach out to [EMAIL_1] or visit [URL_1] IP logged: [IP_1]. FAX: [PHONE_1].",
+   "counts": {
+    "EMAIL": 1,
+    "URL": 1,
+    "IP": 1,
+    "PHONE": 1
+   }
+  }
+ }
+}

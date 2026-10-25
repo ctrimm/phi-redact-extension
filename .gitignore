@@ -1,0 +1,5 @@
+node_modules/
+# The model is downloaded from Hugging Face at runtime; never commit it.
+test/fixtures/model/
+*.onnx
+.DS_Store

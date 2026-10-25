@@ -1,0 +1,50 @@
+{
+  "action": {
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png"
+    },
+    "default_popup": "src/popup/popup.html",
+    "default_title": "phi-redact Upload Guard"
+  },
+  "background": {
+    "service_worker": "src/background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "all_frames": true,
+      "js": [
+        "src/content/content.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  },
+  "description": "Scans files for PII/PHI locally, in your browser, before you upload them \u2014 and offers a redacted copy when it finds something. Nothing you scan ever leaves the device.",
+  "host_permissions": [
+    "https://huggingface.co/*",
+    "https://*.hf.co/*",
+    "https://cdn.jsdelivr.net/*"
+  ],
+  "icons": {
+    "128": "icons/icon128.png",
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png"
+  },
+  "manifest_version": 3,
+  "minimum_chrome_version": "116",
+  "name": "phi-redact Upload Guard",
+  "options_page": "src/options/options.html",
+  "permissions": [
+    "storage",
+    "offscreen"
+  ],
+  "version": "1.0.0"
+}

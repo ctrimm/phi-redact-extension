@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>phi-redact Upload Guard — manual test page</title>
+    <style>
+      body {
+        font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        max-width: 680px;
+        margin: 32px auto;
+        padding: 0 20px 64px;
+        color: #16181d;
+        line-height: 1.55;
+      }
+      section {
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 16px 18px;
+        margin-top: 16px;
+      }
+      #dropzone {
+        border: 2px dashed #9ca3af;
+        border-radius: 10px;
+        padding: 32px;
+        text-align: center;
+        color: #4b5563;
+      }
+      #pastezone {
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        min-height: 60px;
+        padding: 10px;
+      }
+      #log {
+        background: #111827;
+        color: #d1fae5;
+        border-radius: 8px;
+        padding: 12px 14px;
+        font-size: 12.5px;
+        white-space: pre-wrap;
+        min-height: 80px;
+      }
+      button {
+        border: 1px solid #d1d5db;
+        background: #f9fafb;
+        border-radius: 7px;
+        padding: 7px 12px;
+        cursor: pointer;
+      }
+      code { background: #f3f4f6; padding: 1px 5px; border-radius: 4px; }
+    </style>
+  </head>
+  <body>
+    <h1>phi-redact Upload Guard — manual test page</h1>
+    <p>
+      Load the extension unpacked (chrome://extensions, Developer mode,
+      Load unpacked, pick the repo root), open the popup once and let the
+      model download, then serve this folder over http
+      (<code>python3 -m http.server</code>) or open it as a file URL
+      (enable "Allow access to file URLs" for the extension).
+    </p>
+    <p>
+      Every "upload" here is fake: the page just logs what it received in
+      the box at the bottom. If the guard intercepts, the page should see
+      the change/drop/paste event only AFTER you decide in the overlay —
+      and with redacted file names/contents when you choose redacted
+      copies.
+    </p>
+
+    <section>
+      <h2>1. Make a test file</h2>
+      <p>
+        Downloads a fake clinical note containing a name, DOB, SSN, phone,
+        email, and a Luhn-valid test card number:
+      </p>
+      <button id="make-note" type="button">Download fake-note.txt</button>
+      <button id="make-clean" type="button">Download clean-note.txt</button>
+      <p>
+        For image testing, screenshot part of the fake note (or any
+        document with a name/SSN) and use the PNG. For PDF testing, print
+        the fake note to PDF from your browser.
+      </p>
+    </section>
+
+    <section>
+      <h2>2. File input</h2>
+      <input type="file" id="file-input" multiple />
+    </section>
+
+    <section>
+      <h2>3. Drag and drop</h2>
+      <div id="dropzone">Drop files here</div>
+    </section>
+
+    <section>
+      <h2>4. Paste</h2>
+      <div id="pastezone" contenteditable="true">
+        Click here, copy a file in your file manager, and paste (Ctrl+V).
+      </div>
+    </section>
+
+    <section>
+      <h2>What the page received</h2>
+      <div id="log">(nothing yet)</div>
+    </section>
+
+    <script>
+      const log = (msg) => {
+        const box = document.getElementById("log");
+        if (box.textContent === "(nothing yet)") box.textContent = "";
+        box.textContent += msg + "\n";
+      };
+      const describe = async (files, via) => {
+        for (const f of files) {
+          let extra = "";
+          if (f.type.startsWith("text/") || f.name.endsWith(".txt")) {
+            extra = " :: " + (await f.text()).slice(0, 110).replace(/\n/g, " ");
+          }
+          log(`${via}: ${f.name} (${f.size} bytes)${extra}`);
+        }
+      };
+      document
+        .getElementById("file-input")
+        .addEventListener("change", (e) => describe([...e.target.files], "input change"));
+      const dz = document.getElementById("dropzone");
+      dz.addEventListener("dragover", (e) => e.preventDefault());
+      dz.addEventListener("drop", (e) => {
+        e.preventDefault();
+        describe([...e.dataTransfer.files], "drop");
+      });
+      document
+        .getElementById("pastezone")
+        .addEventListener("paste", (e) => {
+          if (e.clipboardData?.files?.length) {
+            describe([...e.clipboardData.files], "paste");
+          }
+        });
+
+      const NOTE =
+        "Patient John Smith, DOB 03/14/1962, was seen at Mercy General Hospital.\n" +
+        "SSN 123-45-6789. Call (312) 555-0167 or email jsmith@example.com.\n" +
+        "Card on file: 4111 1111 1111 1111. MRN 1234567.\n" +
+        "Address: 4210 Wacker Dr, Chicago, IL 60601.\n";
+      const CLEAN =
+        "The patient reports mild seasonal allergies and takes a daily multivitamin.\n" +
+        "Follow up in six months. No concerns at this visit.\n";
+      const download = (name, text) => {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
+        a.download = name;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      };
+      document
+        .getElementById("make-note")
+        .addEventListener("click", () => download("fake-note.txt", NOTE));
+      document
+        .getElementById("make-clean")
+        .addEventListener("click", () => download("clean-note.txt", CLEAN));
+    </script>
+  </body>
+</html>

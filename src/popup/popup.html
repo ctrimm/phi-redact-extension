@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>phi-redact Upload Guard</title>
+    <link rel="stylesheet" href="./popup.css" />
+  </head>
+  <body>
+    <header>
+      <h1>phi-redact</h1>
+      <span class="tag">Upload Guard</span>
+    </header>
+
+    <label class="row toggle">
+      <span>Scan uploads before they leave the browser</span>
+      <input type="checkbox" id="enabled" />
+    </label>
+
+    <div class="row" id="site-row">
+      <span id="site-label">This site</span>
+      <button id="site-toggle" type="button">Disable here</button>
+    </div>
+
+    <div class="block">
+      <div class="block-title">Model (phi-redact v9, on-device)</div>
+      <div class="block-body" id="model-status">Checking...</div>
+      <button id="model-download" type="button" hidden>Download model (about 12 MB)</button>
+    </div>
+
+    <div class="row">
+      <span>Detection threshold</span>
+      <strong id="threshold">0.60</strong>
+    </div>
+
+    <button id="open-options" type="button" class="wide">Options</button>
+    <p class="foot">
+      All scanning happens locally. Model files are fetched once from
+      Hugging Face and cached; your documents never leave the device.
+    </p>
+    <script type="module" src="./popup.js"></script>
+  </body>
+</html>

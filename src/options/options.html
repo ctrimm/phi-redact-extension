@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>phi-redact Upload Guard — Options</title>
+    <link rel="stylesheet" href="./options.css" />
+  </head>
+  <body>
+    <main>
+      <h1>phi-redact Upload Guard</h1>
+      <p class="lede">
+        Scans files locally, in your browser, before you upload them, and
+        offers a redacted copy when it finds PII or PHI. All inference
+        runs on this device.
+      </p>
+
+      <section>
+        <h2>Scanning</h2>
+        <label class="row">
+          <span>Scan uploads</span>
+          <input type="checkbox" id="enabled" />
+        </label>
+        <label class="row">
+          <span>
+            Detection threshold
+            <small>
+              Mean model confidence a detection must reach. 0.60 is the
+              phi-redact SDK default — on the project's golden set it
+              beats 0.50 on precision and F1 at the same recall. Lower
+              catches more, with more false alarms.
+            </small>
+          </span>
+          <span class="threshold-ctl">
+            <input type="range" id="threshold" min="0.3" max="0.9" step="0.05" />
+            <strong id="threshold-value">0.60</strong>
+          </span>
+        </label>
+        <label class="row">
+          <span>
+            Download the model automatically
+            <small>
+              On the first scan, fetch the model from Hugging Face
+              (about 12 MB, once) and cache it locally. If off, scans
+              use the rules layer only until you download it here.
+            </small>
+          </span>
+          <input type="checkbox" id="auto-download" />
+        </label>
+      </section>
+
+      <section>
+        <h2>Model</h2>
+        <p id="model-status" class="status">Checking...</p>
+        <div class="buttons">
+          <button id="model-download" type="button">Download / repair model</button>
+          <button id="model-clear" type="button">Delete cached model</button>
+        </div>
+        <p class="small">
+          Source: huggingface.co/CDT5058/phi-redact —
+          phi-redact-v9-int8.onnx (INT8, 11.3 MB), tokenizer.json,
+          tags.json. Cached in this browser's Cache Storage; deleting it
+          just means the next scan needs a fresh download.
+        </p>
+      </section>
+
+      <section>
+        <h2>Disabled sites</h2>
+        <p class="small">
+          Uploads on these hostnames are not intercepted.
+        </p>
+        <ul id="site-list"></ul>
+        <div class="buttons">
+          <input type="text" id="site-add" placeholder="example.com" />
+          <button id="site-add-btn" type="button">Add</button>
+        </div>
+      </section>
+
+      <section>
+        <h2>Privacy and limits</h2>
+        <p class="small">
+          File contents are read only inside your browser and passed to
+          the extension's own offscreen document for scanning. The
+          extension makes exactly two kinds of network requests:
+          downloading the model files from Hugging Face, and downloading
+          the English OCR language data from jsDelivr (once, then
+          cached). Neither request contains anything about your files.
+        </p>
+        <p class="small">
+          phi-redact is a detection aid, not a certified
+          de-identification tool. It makes no HIPAA Expert Determination
+          or Safe Harbor claim. Review its detections before relying on
+          a redacted copy.
+        </p>
+      </section>
+    </main>
+    <script type="module" src="./options.js"></script>
+  </body>
+</html>
