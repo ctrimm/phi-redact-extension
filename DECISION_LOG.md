@@ -95,3 +95,14 @@ neural SSN/card/IBAN/routing spans through the rules validators, but
 it is an unimplemented spec awaiting a decision there. The extension
 matches shipped SDK 0.3.0 behavior; adding the gate here first would
 create a third behavior. Revisit when the SDK decides.
+
+## Addendum 2026-10-25 — SDK fixed upstream; the divergence is closed
+
+SDK 0.3.1 (ctrimm/phi-redact-sdk, Cory's word) fixes the tokenizer
+truncation cap at the source: the Python engine now strips the
+truncation block from the serialized tokenizer config at load, so its
+own 384-token chunking governs — the same policy this extension adopted
+at v1. The deliberate divergence recorded above no longer exists;
+extension and SDK agree on long-document behavior again. Regression
+tests and the real-model A/B evidence are in the SDK repo's decision
+log (2026-10-25 entry).
