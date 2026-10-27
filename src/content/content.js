@@ -58,6 +58,14 @@
     threshold: 0.6,
     autoDownloadModel: true,
     disabledSites: [],
+    operator: "numbered",
+    salt: "",
+    allowlist: [],
+    denylist: [],
+    recognizers: [],
+    thresholds: {},
+    reviewEnabled: false,
+    reviewMargin: 0.15,
   };
   const settingsReady = chrome.runtime
     .sendMessage({ target: "background", type: "get-settings" })
@@ -72,6 +80,23 @@
   });
   const siteDisabled = () =>
     (settings.disabledSites ?? []).includes(location.hostname);
+
+  /** SDK RedactOptions carried into every scan (all three entry paths
+      funnel through scanFile, so settings apply uniformly). */
+  function currentScanOptions() {
+    return {
+      operator: settings.operator ?? "numbered",
+      salt: settings.salt ?? "",
+      allowlist: settings.allowlist ?? [],
+      denylist: settings.denylist ?? [],
+      recognizers: settings.recognizers ?? [],
+      thresholds: settings.thresholds ?? {},
+      reviewMargin:
+        settings.reviewEnabled === true
+          ? (settings.reviewMargin ?? 0.15)
+          : undefined,
+    };
+  }
 
   // --- messaging -------------------------------------------------------------
   async function toBackground(type, extra = {}) {
@@ -129,25 +154,39 @@
         words = out.words ?? [];
       }
 
+      const options = currentScanOptions();
       let scan = await toOffscreen("scan-text", {
         text,
         threshold: settings.threshold,
+        options,
         autoDownload: settings.autoDownloadModel !== false,
       });
       let modelMissing = false;
       if (!scan?.ok && scan?.code === "MODEL_MISSING") {
         modelMissing = true;
-        scan = await toOffscreen("scan-rules-only", { text });
+        scan = await toOffscreen("scan-rules-only", { text, options });
       }
       if (!scan?.ok) throw new Error(scan?.error ?? "scan failed");
 
       const entities = scan.entities ?? [];
+      const review = scan.review ?? [];
       const status =
-        entities.length > 0 ? "hits" : modelMissing ? "partial" : "clean";
+        entities.length > 0
+          ? "hits"
+          : modelMissing
+            ? "partial"
+            : review.length > 0
+              ? "review"
+              : "clean";
       return {
         ...base,
         status,
         entities,
+        review,
+        // Per-candidate overlay decisions: "pending" (default — not
+        // redacted), "promoted" (redact it), "dismissed" (leave it).
+        reviewDecisions: review.map(() => "pending"),
+        text,
         redacted: scan.redacted ?? null,
         words,
         viaOcr,
@@ -164,18 +203,53 @@
   }
 
   // --- redacted artifacts -------------------------------------------------------
+  /** Entities that will actually be redacted for a result: the scan's
+      kept entities plus any review candidates the user promoted in
+      the overlay. */
+  function finalEntities(result) {
+    const promoted = (result.review ?? [])
+      .filter((_, i) => result.reviewDecisions?.[i] === "promoted")
+      .map((c) => ({
+        start: c.start,
+        end: c.end,
+        label: c.label,
+        text: c.text,
+        source: c.source,
+        score: c.score,
+      }));
+    if (promoted.length === 0) return result.entities;
+    return [...result.entities, ...promoted].sort((a, b) => a.start - b.start);
+  }
+
+  /** Redacted text for the final entity set. Without promotions this
+      is the scan's own output; with promotions the offscreen document
+      re-renders so placeholder numbering follows document order. */
+  async function finalRedactedText(result) {
+    const anyPromoted = (result.reviewDecisions ?? []).some(
+      (d) => d === "promoted",
+    );
+    if (!anyPromoted || result.text == null) return result.redacted;
+    const out = await toOffscreen("apply-placeholders", {
+      text: result.text,
+      entities: finalEntities(result),
+      options: currentScanOptions(),
+    });
+    return out?.ok ? out.redacted : result.redacted;
+  }
+
   async function buildRedactedFile(result) {
     const { file, kind } = result;
     if (kind === "text" || kind === "pdf") {
-      if (result.redacted == null) return null;
+      const redacted = await finalRedactedText(result);
+      if (redacted == null) return null;
       const name =
         kind === "pdf" ? redactedName(file.name, "txt") : redactedName(file.name);
-      return new File([result.redacted], name, { type: "text/plain" });
+      return new File([redacted], name, { type: "text/plain" });
     }
     if (kind === "image") {
       const bitmap = await createImageBitmap(file);
       const out = await toOffscreen("image-boxes", {
-        entities: result.entities,
+        entities: finalEntities(result),
         words: result.words ?? [],
         width: bitmap.width,
         height: bitmap.height,
@@ -231,6 +305,16 @@
     .dl { margin-top: 8px; font-size: 12px; }
     .dl button { background: none; border: none; color: #1d4ed8; cursor: pointer;
       padding: 0; font-size: 12px; text-decoration: underline; }
+    .reviewbox { margin-top: 10px; border-top: 1px dashed #e5e7eb; padding-top: 8px; }
+    .reviewhead { font-size: 12px; font-weight: 600; color: #92400e; line-height: 1.4; }
+    .ents.review li { align-items: center; border-radius: 6px; padding: 3px 4px; }
+    .ents.review li.promoted { background: #fef3c7; }
+    .ents.review li.dismissed { opacity: 0.55; }
+    .rbtns { margin-left: auto; display: flex; gap: 6px; flex: none; }
+    .rbtns button { font-size: 11.5px; padding: 3px 9px; border-radius: 6px;
+      border: 1px solid #d1d5db; background: #f9fafb; color: #111827; cursor: pointer; }
+    .rbtns button.on { background: #111827; color: #fff; border-color: #111827; }
+    .rstate { font-size: 11px; color: #6b7280; flex: none; min-width: 84px; }
     .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
     .actions button { border-radius: 8px; padding: 9px 14px; font-size: 13.5px;
       cursor: pointer; border: 1px solid #d1d5db; background: #f9fafb; color: #111827; }
@@ -281,13 +365,73 @@
     });
   }
 
+  /**
+   * The review bucket: borderline candidates (below their threshold,
+   * inside the review band) for one file. Each is pending by default —
+   * NOT redacted — and the user can promote it to redaction or dismiss
+   * it before releasing the file. Decisions live on the result object
+   * (reviewDecisions) and are honored by finalEntities().
+   */
+  function renderReviewBucket(r) {
+    const box = el("div", "reviewbox");
+    box.appendChild(el("div", "reviewhead",
+      `Borderline — ${r.review.length} scored below the redaction threshold. ` +
+      "They are uploaded as-is unless you redact them:"));
+    const ul = el("ul", "ents review");
+    const shown = r.review.slice(0, 25);
+    shown.forEach((c, i) => {
+      const li = document.createElement("li");
+      li.appendChild(el("span", "chip", c.label));
+      li.appendChild(el("span", "etext", c.text));
+      li.appendChild(el("span", "score",
+        `${Math.round(c.score * 100)}% · ${c.source}`));
+      const state = el("span", "rstate", "");
+      const btns = el("span", "rbtns");
+      const bRedact = el("button", null, "Redact");
+      const bKeep = el("button", null, "Keep");
+      const apply = () => {
+        const d = r.reviewDecisions[i];
+        li.classList.toggle("promoted", d === "promoted");
+        li.classList.toggle("dismissed", d === "dismissed");
+        bRedact.classList.toggle("on", d === "promoted");
+        bKeep.classList.toggle("on", d === "dismissed");
+        state.textContent =
+          d === "promoted" ? "Will be redacted" : d === "dismissed" ? "Left as-is" : "";
+      };
+      bRedact.addEventListener("click", () => {
+        r.reviewDecisions[i] =
+          r.reviewDecisions[i] === "promoted" ? "pending" : "promoted";
+        apply();
+      });
+      bKeep.addEventListener("click", () => {
+        r.reviewDecisions[i] =
+          r.reviewDecisions[i] === "dismissed" ? "pending" : "dismissed";
+        apply();
+      });
+      btns.append(bRedact, bKeep);
+      li.append(state, btns);
+      ul.appendChild(li);
+    });
+    if (r.review.length > shown.length) {
+      const li = document.createElement("li");
+      li.appendChild(el("span", "score",
+        `... and ${r.review.length - shown.length} more (left as-is)`));
+      ul.appendChild(li);
+    }
+    box.appendChild(ul);
+    return box;
+  }
+
   function showReview(results, decide) {
     return showOverlay((panel, close) => {
       const totalHits = results.reduce((a, r) => a + r.entities.length, 0);
+      const totalReview = results.reduce((a, r) => a + (r.review?.length ?? 0), 0);
       panel.appendChild(el("h2", null,
         totalHits > 0
           ? `phi-redact found ${totalHits} possible identifier${totalHits === 1 ? "" : "s"}`
-          : "phi-redact could not fully scan this upload"));
+          : totalReview > 0
+            ? `phi-redact found ${totalReview} borderline detection${totalReview === 1 ? "" : "s"} to review`
+            : "phi-redact could not fully scan this upload"));
       panel.appendChild(el("p", "sub",
         "The upload is paused. Review what was detected, then choose how to proceed. " +
         "Redacted copies replace each identifier with a placeholder like [NAME_PATIENT_1]."));
@@ -300,11 +444,13 @@
             ? `${r.entities.length} detection${r.entities.length === 1 ? "" : "s"}`
             : r.status === "clean"
               ? "Scanned — nothing found"
-              : r.status === "partial"
-                ? "Partially scanned"
-                : r.status === "error"
-                  ? "Scan failed"
-                  : "Not scanned");
+              : r.status === "review"
+                ? "Scanned — nothing auto-redacted"
+                : r.status === "partial"
+                  ? "Partially scanned"
+                  : r.status === "error"
+                    ? "Scan failed"
+                    : "Not scanned");
         box.appendChild(meta);
         if (r.entities.length > 0) {
           const ul = el("ul", "ents");
@@ -328,11 +474,19 @@
           }
           box.appendChild(ul);
         }
+        if (r.review?.length > 0) {
+          box.appendChild(renderReviewBucket(r));
+        }
         if (r.note) box.appendChild(el("div", "note", r.note));
-        if (r.status === "hits") {
+        if (r.status === "hits" || r.review?.length > 0) {
           const dl = el("div", "dl");
           const btn = el("button", null, "Download redacted copy");
           btn.addEventListener("click", async () => {
+            if (finalEntities(r).length === 0) {
+              btn.textContent = "Promote a borderline item first";
+              setTimeout(() => { btn.textContent = "Download redacted copy"; }, 1600);
+              return;
+            }
             btn.disabled = true;
             btn.textContent = "Preparing...";
             const f = await buildRedactedFile(r);
@@ -364,10 +518,15 @@
         btnRedacted.textContent = "Preparing redacted copies...";
         const files = [];
         for (const r of results) {
-          if (r.status === "hits") {
+          const promotedAny = (r.reviewDecisions ?? []).some(
+            (d) => d === "promoted",
+          );
+          if (r.status === "hits" || promotedAny) {
             const f = await buildRedactedFile(r);
             if (f) files.push(f);
-          } else if (r.status === "clean" || r.status === "partial") {
+          } else if (
+            r.status === "clean" || r.status === "partial" || r.status === "review"
+          ) {
             files.push(r.file);
           }
         }

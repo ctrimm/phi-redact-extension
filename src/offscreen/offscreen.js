@@ -17,7 +17,7 @@ import * as ort from "../../vendor/ort/ort.wasm.bundle.min.mjs";
 import * as pdfjsLib from "../../vendor/pdfjs/pdf.min.mjs";
 import { WordPieceTokenizer } from "../lib/tokenizer.js";
 import { NeuralEngine } from "../lib/neural.js";
-import { scanAll } from "../lib/merge.js";
+import { applyPlaceholders, checkRecognizer, scanAll } from "../lib/merge.js";
 import { assembleOcrText, boxesForEntities } from "../lib/spanImage.js";
 import {
   MODEL_CACHE,
@@ -316,16 +316,55 @@ function b64ToBytes(b64) {
   return bytes;
 }
 
+// ---------------------------------------------------------------------------
+// Scan options (SDK RedactOptions, carried on scan messages)
+// ---------------------------------------------------------------------------
+
+/**
+ * Build the scanAll options from a message. Recognizers stored in
+ * settings are user input: a malformed entry must never break
+ * scanning, so invalid ones are dropped here (the options page
+ * validates inline and refuses to save them in the first place).
+ */
+function scanOptions(message) {
+  const o = message.options ?? {};
+  const recognizers = (o.recognizers ?? []).filter(
+    (r) => checkRecognizer(r) === null,
+  );
+  return {
+    operator: o.operator ?? "numbered",
+    salt: o.salt ?? "",
+    allowlist: o.allowlist ?? [],
+    denylist: o.denylist ?? [],
+    recognizers,
+    thresholds: o.thresholds ?? {},
+    reviewMargin: o.reviewMargin ?? undefined,
+    threshold: message.threshold ?? 0.6,
+  };
+}
+
+function scanResponse(result) {
+  return {
+    ok: true,
+    entities: result.entities,
+    redacted: result.redacted,
+    counts: result.counts,
+    engine: result.engine,
+    review: result.review,
+  };
+}
+
 // Debug/testing hook: reachable only from extension contexts (this
 // page is not web-accessible). Lets the manual test flow and CDP-driven
 // checks exercise the engine without the message plumbing.
 window.__phiRedact = {
   status: () => refreshState(),
   download: () => downloadModel(),
-  scan: async (text, threshold = 0.6) => {
+  scan: async (text, options = {}) => {
     const engine = await ensureEngine(true);
-    const neural = await engine.predict(text, threshold);
-    return scanAll(text, neural);
+    const opts = scanOptions({ options, threshold: options.threshold });
+    const neural = await engine.predict(text, 0);
+    return scanAll(text, neural, opts);
   },
   ocr: async (dataB64, mime) => {
     const words = await ocrImageBytes(b64ToBytes(dataB64), mime);
@@ -357,29 +396,33 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         }
         case "scan-text": {
           const engine = await ensureEngine(message.autoDownload !== false);
-          const threshold = message.threshold ?? 0.6;
-          const neural = await engine.predict(message.text ?? "", threshold);
-          const result = scanAll(message.text ?? "", neural);
-          sendResponse({
-            ok: true,
-            entities: result.entities,
-            redacted: result.redacted,
-            counts: result.counts,
-            engine: result.engine,
-          });
+          const options = scanOptions(message);
+          // Ungated spans: scanAll's score gate applies the effective
+          // thresholds and the review band.
+          const neural = await engine.predict(message.text ?? "", 0);
+          const result = scanAll(message.text ?? "", neural, options);
+          sendResponse(scanResponse(result));
           break;
         }
         case "scan-rules-only": {
           // Used when the neural model is unavailable and the caller
-          // still wants the deterministic layer's answer.
-          const result = scanAll(message.text ?? "", []);
-          sendResponse({
-            ok: true,
-            entities: result.entities,
-            redacted: result.redacted,
-            counts: result.counts,
-            engine: result.engine,
-          });
+          // still wants the deterministic layer's answer (rules +
+          // recognizers + lists + operators).
+          const result = scanAll(message.text ?? "", [], scanOptions(message));
+          sendResponse(scanResponse(result));
+          break;
+        }
+        case "apply-placeholders": {
+          // Re-render redacted text for a caller-chosen entity set —
+          // the review overlay uses this when the user promotes
+          // borderline candidates to redaction.
+          const options = scanOptions(message);
+          const { redacted, mapping } = applyPlaceholders(
+            message.text ?? "",
+            message.entities ?? [],
+            options,
+          );
+          sendResponse({ ok: true, redacted, mapping });
           break;
         }
         case "extract-pdf": {

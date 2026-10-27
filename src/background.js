@@ -15,6 +15,17 @@ export const DEFAULT_SETTINGS = {
   threshold: 0.6, // SDK default (phi-redact-sdk 0.3.0)
   autoDownloadModel: true,
   disabledSites: [], // hostnames, e.g. "example.com"
+  // SDK 0.4.0 parity: anonymize operator + allow/deny lists.
+  operator: "numbered", // numbered | label | mask | hash | remove
+  salt: "", // hash-operator salt (only used when operator is "hash")
+  allowlist: [], // terms never redacted (case-insensitive exact match)
+  denylist: [], // terms always redacted, labeled CUSTOM
+  // SDK 0.5.0 parity: custom recognizers, per-label thresholds,
+  // needs-review mode.
+  recognizers: [], // [{ label, patterns, score?, context?, ... }]
+  thresholds: {}, // label -> threshold override
+  reviewEnabled: false,
+  reviewMargin: 0.15, // band width below the gate flagged for review
 };
 
 async function getSettings() {
@@ -23,10 +34,19 @@ async function getSettings() {
 }
 
 async function setSettings(patch) {
-  const next = { ...(await getSettings()), ...patch };
-  await chrome.storage.local.set({ [SETTINGS_KEY]: next });
-  return next;
+  // Serialize read-modify-write: several patches in quick succession
+  // (the options page saving a section) must not read the same stale
+  // snapshot and clobber each other.
+  const run = settingsWrite.then(async () => {
+    const next = { ...(await getSettings()), ...patch };
+    await chrome.storage.local.set({ [SETTINGS_KEY]: next });
+    return next;
+  });
+  settingsWrite = run.catch(() => {});
+  return run;
 }
+
+let settingsWrite = Promise.resolve();
 
 // ---------------------------------------------------------------------------
 // Offscreen document lifecycle

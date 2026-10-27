@@ -2,6 +2,71 @@
 
 Data-backed decisions for this repo. New entries on top.
 
+## 2026-10-27 — SDK 0.4.0/0.5.0 features in the UI: operators, lists, recognizers, thresholds, review mode
+
+**Engine ported forward.** `src/lib/merge.js` is now a full port of
+the SDK's TypeScript engine at 0.4.0 + 0.5.0 (the 0.5.0 API shapes
+were taken from the SDK tree as that build landed: `Recognizer`,
+`thresholds`, `reviewMargin`, `result.review`). It replaces the
+0.3.0-era merge/placeholder layer: anonymize operators (numbered /
+label / mask / hash / remove, salted SHA-256 construction identical
+to the SDK, pinned by the shared test vectors), allow/deny lists,
+custom recognizers (patterns, context boost, named validators;
+precedence rules > recognizers > neural), per-label thresholds, and
+the score gate with needs-review partitioning. The SDK's batch,
+scrub, and ChunkedRestorer APIs were not ported — the extension has
+no batch or LLM round-trip surface. Under default settings the new
+engine's output is byte-for-byte the old output (unit-tested).
+
+**The user threshold is the score gate.** The SDK's TS engine
+hardcodes its global gate at DEFAULT_THRESHOLD in partitionByScore
+because its neural layer gates server-side. Here the gate has to be
+the extension's user-facing threshold, so `scanAll` takes it as
+`options.threshold`, and the offscreen document now runs the neural
+engine ungated (threshold 0) and lets the gate apply effective
+thresholds. At the default 0.6 the kept set is unchanged; this is
+also the only way review candidates can exist — a span the model
+scored at 0.55 was previously discarded inside predict() before any
+UI could ever see it.
+
+**Review bucket semantics.** Candidates are pending by default and
+are NOT redacted (SDK semantics: not in entities, not counted, not
+in the mapping). Promoting one re-renders the file's redacted text
+through the offscreen document (`apply-placeholders` message) so
+numbering follows document order, and image black-boxes are computed
+from the final entity set. Files whose only findings are borderline
+now pause the upload (new "review" status) instead of passing as
+clean. With review mode off, scans return an empty review list and
+the overlay renders exactly as before (verified in Chrome).
+
+**Settings flow.** All scan paths (file input, drop, paste — and the
+rules-only fallback) build one options object from chrome.storage in
+the content script and carry it on every scan message. The offscreen
+document defensively drops stored recognizers that fail validation,
+so a corrupt entry can never break scanning; the options page
+validates with the same `checkRecognizer` and refuses to save invalid
+recognizers, showing the error inline.
+
+**Bug found by E2E: settings write race.** The background's
+setSettings did an unserialized read-modify-write; the options page
+saving several sections in quick succession (as the new, denser page
+does) could lose patches — review settings silently reverted while
+lists and recognizers saved. Writes are now serialized through a
+promise chain in the service worker.
+
+**Verification.** Unit 72/72 (38 pre-existing + 34 new in
+test/features.test.js: operators incl. the SDK's pinned hash
+vectors, lists, recognizers, thresholds, review band edges).
+Integration parity vs the SDK Python engine passes with the real v9
+model. A CDP-driven pass in the sandbox Chrome (26 checks) covered:
+options-page persistence for every new setting; an upload whose
+overlay showed 5 detections plus the Borderline bucket (recognizer
+span at 50%); promoting the candidate and releasing — the page
+received a copy with [EMPLOYEE_ID_1], [CUSTOM_1], [SSN_1] and no raw
+identifiers; and the review-off path releasing originals untouched
+with no bucket rendered. Screenshots: screenshots/options.png,
+screenshots/overlay-review.png. Version 1.0.0 -> 1.1.0.
+
 ## 2026-10-24 — v1 scope and architecture
 
 **Host the engine in an MV3 offscreen document.**

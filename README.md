@@ -85,6 +85,23 @@ tesseract.js) are vendored under `vendor/` (26.9 MB — see
 
 - **On/off** and **per-site disable** (popup, or the options page).
 - **Detection threshold** (options; default 0.6, the SDK default).
+- **Review mode** (options): detections scoring just below the
+  threshold are held in a "Borderline" bucket in the review panel
+  instead of being dropped — you decide per item whether to redact
+  them before the upload proceeds.
+- **Redaction style** (options): numbered placeholders (default,
+  reversible), label (`<SSN>`), mask (`***-**-6789`), hash (consistent
+  pseudonyms — the same value always becomes the same token; takes an
+  optional salt), or remove. Same operators as the phi-redact SDK.
+- **Per-label thresholds** (options): override the global threshold
+  for specific labels. Rules-based detections have no score and
+  always redact.
+- **Allowlist / denylist** (options): allowlisted terms are never
+  redacted; denylisted terms are always redacted (labeled CUSTOM).
+- **Custom recognizers** (options): your own regex patterns with a
+  label and score, optional context words that boost the score, and
+  optional checksum validators (Luhn, SSN, IBAN, ABA) — the SDK's
+  Presidio-style recognizer API, applied to every scan.
 - **Model management** (options): download/repair, delete the cache,
   and automatic-download on/off.
 
@@ -119,7 +136,8 @@ tesseract.js) are vendored under `vendor/` (26.9 MB — see
 npm install        # devDependencies, only needed to re-vendor or test
 npm run vendor     # regenerate vendor/ from node_modules
 npm test           # unit tests (tokenizer parity, BIOES, rules, merge,
-                   # routing, OCR span mapping) — no network, no model
+                   # routing, OCR span mapping, SDK feature parity)
+                   # — no network, no model
 npm run test:integration   # full parity vs the SDK's Python engine
 ```
 
@@ -138,11 +156,16 @@ page receives through file-input, drop, and paste flows.
 
 - **Model**: CDT5058/phi-redact v9, INT8 ONNX artifact, downloaded at
   runtime (never committed here).
-- **SDK**: ctrimm/phi-redact-sdk 0.3.0. `src/lib/rules.js` and
-  `src/lib/merge.js` are ports of its TypeScript engine;
-  `src/lib/tokenizer.js` and `src/lib/bioes.js` port the Python
-  engine's ONNX inference path. The extension's behavior was verified
-  against the Python engine on shared fixtures.
+- **SDK**: ctrimm/phi-redact-sdk. `src/lib/rules.js` ports its
+  TypeScript rules layer; `src/lib/merge.js` ports its engine —
+  merge policy and placeholders (0.3.0), plus the 0.4.0 anonymize
+  operators and allow/deny lists and the 0.5.0 custom recognizers,
+  per-label thresholds, and needs-review mode. `src/lib/tokenizer.js`
+  and `src/lib/bioes.js` port the Python engine's ONNX inference
+  path. The extension's behavior was verified against the Python
+  engine on shared fixtures (integration test) and the feature
+  semantics against the SDK's TypeScript suite (shared hash vectors,
+  `test/features.test.js`).
 - One deliberate divergence: the SDK engine's neural scan silently
   truncates long texts at 256 tokens (an interaction between
   tokenizer.json's truncation setting and its chunking check). The

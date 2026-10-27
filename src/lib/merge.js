@@ -2,84 +2,537 @@
  * Merge + placeholder layer for phi-redact.
  *
  * Ported from the phi-redact SDK (ctrimm/phi-redact-sdk,
- * typescript/src/engine.ts, Apache-2.0) with types stripped; behavior is
- * unchanged.
+ * typescript/src/engine.ts, Apache-2.0) with types stripped. Covers
+ * SDK 0.4.0 (anonymize operators, allow/deny lists) and 0.5.0 (custom
+ * recognizers, per-label thresholds, needs-review mode).
  *
- * Merge policy: rules win every overlap with a neural span; neural-neural
- * overlaps keep the higher score. Placeholders are numbered per label in
- * forward document order: [NAME_PATIENT_1], [PHONE_2], ...
+ * Merge policy: rules > recognizers > neural. Rules win every overlap
+ * (checksum-gated precision); recognizer spans are deterministic user
+ * intent and win overlaps against neural spans; neural-neural overlaps
+ * keep the higher score.
+ *
+ * Score gate: only spans carrying a score (neural, recognizer) are
+ * gated; rule and denylist spans always redact. A scored span redacts
+ * when its score reaches its effective threshold — its per-label
+ * override (options.thresholds) or the global gate. The SDK's TS
+ * engine hardcodes the global gate at DEFAULT_THRESHOLD because its
+ * neural layer gates elsewhere; here the extension's user-facing
+ * threshold is the global gate, passed as options.threshold
+ * (default DEFAULT_THRESHOLD). When options.reviewMargin is set, a
+ * scored span that misses its gate but lands within the margin comes
+ * back on result.review for a human decision instead of being dropped.
+ *
+ * Placeholders under the default "numbered" operator are numbered per
+ * label in forward document order: [NAME_PATIENT_1], [PHONE_2], ...
+ * The batch / scrub / ChunkedRestorer APIs from the SDK engine are
+ * not ported: the extension has no batch or LLM round-trip surface.
  */
 
-import { restoreText, scan as rulesScan } from "./rules.js";
+import {
+  abaRoutingOk,
+  ibanValid,
+  luhnOk,
+  restoreText,
+  scan as rulesScan,
+  ssnValid,
+} from "./rules.js";
+
+export const OPERATORS = ["numbered", "label", "mask", "hash", "remove"];
+export const DEFAULT_DENY_LABEL = "CUSTOM";
+export const DEFAULT_THRESHOLD = 0.6;
 
 const overlaps = (a, b) => !(a.end <= b.start || a.start >= b.end);
 
+// ---------------------------------------------------------------------------
+// Merge
+// ---------------------------------------------------------------------------
+
 /**
- * Rules win every overlap. Neural-neural overlaps keep the best score.
+ * Merge the detection layers. Precedence: rules > recognizers >
+ * neural. recognizerEnts must arrive in precedence order
+ * (recognizerSpans returns them so); among themselves the first wins.
  * Returns entities sorted by start.
  */
-export function mergeEntities(ruleEnts, neuralEnts = []) {
+export function mergeEntities(ruleEnts, neuralEnts = [], recognizerEnts = []) {
+  const base = [...ruleEnts];
+  for (const r of recognizerEnts) {
+    if (base.some((b) => overlaps(r, b))) continue;
+    base.push(r);
+  }
   const kept = [];
-  for (const n of [...neuralEnts].sort(
-    (a, b) => (b.score ?? 0) - (a.score ?? 0),
-  )) {
-    if (ruleEnts.some((r) => overlaps(n, r))) continue;
+  for (const n of [...neuralEnts].sort((a, b) => (b.score ?? 0) - (a.score ?? 0))) {
+    if (base.some((b) => overlaps(n, b))) continue;
     if (kept.some((k) => overlaps(n, k))) continue;
     kept.push(n);
   }
-  return [...ruleEnts, ...kept].sort((a, b) => a.start - b.start);
+  return [...base, ...kept].sort((a, b) => a.start - b.start);
+}
+
+// ---------------------------------------------------------------------------
+// SHA-256 — pure JS, same construction as the SDK (no WebCrypto: it is
+// async, and this layer is sync). Used only by the "hash" operator.
+// ---------------------------------------------------------------------------
+
+const SHA256_K = [
+  0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1,
+  0x923f82a4, 0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3,
+  0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786,
+  0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+  0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147,
+  0x06ca6351, 0x14292967, 0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13,
+  0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85, 0xa2bfe8a1, 0xa81a664b,
+  0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+  0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a,
+  0x5b9cca4f, 0x682e6ff3, 0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208,
+  0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
+];
+
+const rotr = (x, n) => (x >>> n) | (x << (32 - n));
+
+/** SHA-256 of the UTF-8 encoding, as lowercase hex. */
+export function sha256Hex(input) {
+  const bytes = new TextEncoder().encode(input);
+  const bitLen = bytes.length * 8;
+  const paddedLen = (((bytes.length + 8) >> 6) + 1) << 6;
+  const buf = new Uint8Array(paddedLen);
+  buf.set(bytes);
+  buf[bytes.length] = 0x80;
+  const dv = new DataView(buf.buffer);
+  dv.setUint32(paddedLen - 4, bitLen >>> 0);
+  dv.setUint32(paddedLen - 8, Math.floor(bitLen / 2 ** 32));
+
+  let h0 = 0x6a09e667, h1 = 0xbb67ae85, h2 = 0x3c6ef372, h3 = 0xa54ff53a;
+  let h4 = 0x510e527f, h5 = 0x9b05688c, h6 = 0x1f83d9ab, h7 = 0x5be0cd19;
+  const w = new Int32Array(64);
+  for (let block = 0; block < paddedLen; block += 64) {
+    for (let i = 0; i < 16; i++) w[i] = dv.getInt32(block + i * 4);
+    for (let i = 16; i < 64; i++) {
+      const s0 = rotr(w[i - 15], 7) ^ rotr(w[i - 15], 18) ^ (w[i - 15] >>> 3);
+      const s1 = rotr(w[i - 2], 17) ^ rotr(w[i - 2], 19) ^ (w[i - 2] >>> 10);
+      w[i] = (w[i - 16] + s0 + w[i - 7] + s1) | 0;
+    }
+    let a = h0, b = h1, c = h2, d = h3, e = h4, f = h5, g = h6, h = h7;
+    for (let i = 0; i < 64; i++) {
+      const s1 = rotr(e, 6) ^ rotr(e, 11) ^ rotr(e, 25);
+      const ch = (e & f) ^ (~e & g);
+      const t1 = (h + s1 + ch + SHA256_K[i] + w[i]) | 0;
+      const s0 = rotr(a, 2) ^ rotr(a, 13) ^ rotr(a, 22);
+      const maj = (a & b) ^ (a & c) ^ (b & c);
+      const t2 = (s0 + maj) | 0;
+      h = g; g = f; f = e; e = (d + t1) | 0;
+      d = c; c = b; b = a; a = (t1 + t2) | 0;
+    }
+    h0 = (h0 + a) | 0; h1 = (h1 + b) | 0; h2 = (h2 + c) | 0; h3 = (h3 + d) | 0;
+    h4 = (h4 + e) | 0; h5 = (h5 + f) | 0; h6 = (h6 + g) | 0; h7 = (h7 + h) | 0;
+  }
+  return [h0, h1, h2, h3, h4, h5, h6, h7]
+    .map((x) => (x >>> 0).toString(16).padStart(8, "0"))
+    .join("");
 }
 
 /**
- * Replace back-to-front with temp tokens, then renumber per label in
- * forward document order: [NAME_PATIENT_1], [PHONE_2], ...
+ * Consistent pseudonym token for the "hash" operator:
+ * [LABEL_<8 hex>] from SHA-256(salt \0 label \0 value). Identical
+ * construction to the SDK (shared test vectors pin it). The salt
+ * defaults to "" but should be a secret in practice: low-entropy
+ * values (SSNs) are dictionary-attackable from an unsalted hash.
  */
-export function applyPlaceholders(text, entities) {
-  const temps = new Map();
-  let out = text;
-  const staging = {};
+export function hashToken(label, value, salt = "") {
+  const digest = sha256Hex(`${salt}\0${label}\0${value}`).slice(0, 8);
+  return `[${label}_${digest}]`;
+}
 
-  [...entities]
-    .sort((a, b) => b.start - a.start)
-    .forEach((e, i) => {
-      const tmp = `[\u0000${i}]`;
-      temps.set(e, tmp);
-      staging[tmp] = e.text;
-      out = out.slice(0, e.start) + tmp + out.slice(e.end);
-    });
+// Labels whose values are structured IDs: masking keeps the last 4
+// characters when the value is long enough for that to be safe.
+const MASK_KEEP_LAST = new Set([
+  "SSN", "CREDITCARD", "PHONE", "TAX_ID", "ROUTING_NUMBER",
+  "BANK_ACCOUNT", "ACCOUNT", "IBAN", "PASSPORT", "DRIVERS_LICENSE",
+  "LICENSE", "GOVERNMENT_ID", "MRN",
+]);
 
+/**
+ * Masked rendering for the "mask" operator. Structured IDs of length
+ * >= 8 keep their last 4 characters; preceding alphanumeric characters
+ * become "*" and separators are preserved ("234-56-7890" ->
+ * "***-**-7890"). Every other value is masked to its own length.
+ */
+export function maskValue(label, value) {
+  if (MASK_KEEP_LAST.has(label) && value.length >= 8) {
+    const head = [...value.slice(0, -4)]
+      .map((c) => (/[A-Za-z0-9]/.test(c) ? "*" : c))
+      .join("");
+    return head + value.slice(-4);
+  }
+  return "*".repeat(value.length);
+}
+
+function replacement(e, n, operator, salt) {
+  switch (operator) {
+    case "numbered":
+      return `[${e.label}_${n}]`;
+    case "label":
+      return `<${e.label}>`;
+    case "hash":
+      return hashToken(e.label, e.text, salt);
+    case "mask":
+      return maskValue(e.label, e.text);
+    case "remove":
+      return "";
+  }
+}
+
+/**
+ * Render entities into text under the chosen anonymize operator.
+ * Replacements are computed in forward document order (so "numbered"
+ * numbers per label in reading order), then spliced back-to-front so
+ * offsets stay valid. The returned mapping is populated only for
+ * "numbered" — the other operators are irreversible by design.
+ */
+export function applyPlaceholders(text, entities, options = {}) {
+  const operator = options.operator ?? "numbered";
+  if (!OPERATORS.includes(operator)) {
+    throw new Error(
+      `unknown operator ${JSON.stringify(operator)}; expected one of ${OPERATORS.join(", ")}`,
+    );
+  }
+  const salt = options.salt ?? "";
   const counters = {};
   const mapping = {};
+  const reps = new Map();
   for (const e of [...entities].sort((a, b) => a.start - b.start)) {
     counters[e.label] = (counters[e.label] ?? 0) + 1;
-    const ph = `[${e.label}_${counters[e.label]}]`;
-    e.placeholder = ph;
-    mapping[ph] = staging[temps.get(e)];
-    out = out.split(temps.get(e)).join(ph);
+    const rep = replacement(e, counters[e.label], operator, salt);
+    e.placeholder = rep;
+    reps.set(e, rep);
+    if (operator === "numbered") mapping[rep] = e.text;
+  }
+  let out = text;
+  for (const e of [...entities].sort((a, b) => b.start - a.start)) {
+    out = out.slice(0, e.start) + reps.get(e) + out.slice(e.end);
   }
   return { redacted: out, mapping };
 }
 
+// ---------------------------------------------------------------------------
+// Allow / deny lists
+// ---------------------------------------------------------------------------
+
 /**
- * Full scan: rules + (optional) neural entities, merged, with the
- * redacted text and counts — the SDK's RedactionResult shape.
+ * Drop spans whose text matches an allowlist term (case-insensitive,
+ * exact string — a term protects exactly the value it names).
+ */
+export function applyAllowlist(entities, allowlist) {
+  if (!allowlist || allowlist.length === 0) return entities;
+  const allowed = new Set(allowlist.map((t) => t.toLowerCase()));
+  return entities.filter((e) => !allowed.has(e.text.toLowerCase()));
+}
+
+const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/**
+ * Exact-match spans for denylist terms: case-insensitive, word-boundary
+ * aware (a term never matches inside a larger word).
+ */
+export function denylistSpans(text, denylist, label = DEFAULT_DENY_LABEL) {
+  const spans = [];
+  for (const term of denylist) {
+    if (!term) continue;
+    const re = new RegExp(`(?<!\\w)${escapeRegExp(term)}(?!\\w)`, "gi");
+    for (const m of text.matchAll(re)) {
+      spans.push({
+        start: m.index,
+        end: m.index + m[0].length,
+        label,
+        text: m[0],
+        source: "denylist",
+      });
+    }
+  }
+  return spans;
+}
+
+/**
+ * Add denylist spans to a detected entity list. A deny span wins any
+ * overlap: a detected span it touches is dropped. Overlapping deny
+ * matches keep the first in document order.
+ */
+export function injectDenylist(text, entities, denylist, label = DEFAULT_DENY_LABEL) {
+  if (!denylist || denylist.length === 0) return entities;
+  const deny = denylistSpans(text, denylist, label);
+  if (deny.length === 0) return entities;
+  const kept = entities.filter((e) => !deny.some((d) => overlaps(e, d)));
+  const merged = [];
+  for (const d of [...deny].sort((a, b) => a.start - b.start)) {
+    if (merged.some((k) => overlaps(d, k))) continue;
+    merged.push(d);
+  }
+  return [...kept, ...merged].sort((a, b) => a.start - b.start);
+}
+
+/**
+ * Allowlist filter, then denylist injection. Deny wins over allow: a
+ * term in both lists is redacted (as a deny span).
+ */
+export function processEntities(text, entities, options = {}) {
+  let out = applyAllowlist(entities, options.allowlist);
+  out = injectDenylist(text, out, options.denylist,
+                       options.denyLabel ?? DEFAULT_DENY_LABEL);
+  return out;
+}
+
+// ---------------------------------------------------------------------------
+// Custom recognizers (SDK 0.5.0, Presidio parity)
+// ---------------------------------------------------------------------------
+
+/** Named checksum validators a recognizer can reference by string. */
+export const NAMED_VALIDATORS = {
+  luhn: luhnOk,
+  ssn: ssnValid,
+  iban: ibanValid,
+  aba: abaRoutingOk,
+};
+
+const round4 = (x) => Math.round(x * 10000) / 10000;
+
+/** Throws an Error describing the first problem with a recognizer. */
+export function validateRecognizer(rec) {
+  if (!rec || typeof rec !== "object") {
+    throw new Error("recognizer must be an object");
+  }
+  if (!rec.label) throw new Error("recognizer label must be non-empty");
+  if (!rec.patterns || rec.patterns.length === 0) {
+    throw new Error("recognizer needs at least one pattern");
+  }
+  for (const p of rec.patterns) {
+    try {
+      new RegExp(p, "g");
+    } catch (err) {
+      throw new Error(`invalid pattern ${JSON.stringify(p)}: ${err.message}`);
+    }
+  }
+  const score = rec.score ?? 0.85;
+  if (!(score >= 0 && score <= 1)) {
+    throw new Error(`recognizer score ${score} outside [0, 1]`);
+  }
+  if ((rec.contextWindow ?? 40) < 0) {
+    throw new Error("contextWindow must be >= 0");
+  }
+  if ((rec.contextBoost ?? 0.1) < 0) {
+    throw new Error("contextBoost must be >= 0");
+  }
+  if (rec.requireContext && (!rec.context || rec.context.length === 0)) {
+    throw new Error("requireContext=true needs context words");
+  }
+  if (typeof rec.validator === "string" && !(rec.validator in NAMED_VALIDATORS)) {
+    throw new Error(
+      `unknown validator ${JSON.stringify(rec.validator)}; expected ` +
+        `one of ${Object.keys(NAMED_VALIDATORS).join(", ")}`,
+    );
+  }
+  if ((rec.group ?? 0) < 0) throw new Error("group must be >= 0");
+}
+
+/**
+ * Non-throwing recognizer check for UI validation and defensive
+ * filtering of stored settings: returns an error string, or null when
+ * the recognizer is usable.
+ */
+export function checkRecognizer(rec) {
+  try {
+    validateRecognizer(rec);
+    return null;
+  } catch (err) {
+    return String(err?.message ?? err);
+  }
+}
+
+function resolveValidator(validator) {
+  if (validator === undefined || validator === null) return undefined;
+  if (typeof validator === "function") return validator;
+  const fn = NAMED_VALIDATORS[validator];
+  if (!fn) {
+    throw new Error(
+      `unknown validator ${JSON.stringify(validator)}; expected a ` +
+        `function or one of ${Object.keys(NAMED_VALIDATORS).join(", ")}`,
+    );
+  }
+  return fn;
+}
+
+function contextPresent(text, s, e, rec) {
+  const w = rec.contextWindow ?? 40;
+  const lo = Math.max(0, s - w);
+  const hi = Math.min(text.length, e + w);
+  const win = (text.slice(lo, s) + text.slice(e, hi)).toLowerCase();
+  return (rec.context ?? []).some(
+    (word) => word !== "" && win.includes(word.toLowerCase()),
+  );
+}
+
+/**
+ * Run user recognizers over text. Returns scored spans (source
+ * "recognizer") in PRECEDENCE order — recognizer registration order,
+ * then pattern order, then document order — with overlaps among them
+ * already resolved first-wins in that order. mergeEntities relies on
+ * this order; the final entity list is sorted by start there.
+ */
+export function recognizerSpans(text, recognizers = []) {
+  const accepted = [];
+  for (const rec of recognizers) {
+    validateRecognizer(rec);
+    const validate = resolveValidator(rec.validator);
+    const baseScore = rec.score ?? 0.85;
+    const grp = rec.group ?? 0;
+    for (const pattern of rec.patterns) {
+      // Fresh RegExp per scan: /g regexes are stateful (lastIndex).
+      const re = new RegExp(pattern, "g");
+      for (const m of text.matchAll(re)) {
+        const value = m[grp];
+        if (value === undefined || value === "") continue;
+        const start = (m.index ?? 0) + (grp ? m[0].indexOf(value) : 0);
+        const end = start + value.length;
+        if (validate && !validate(value)) continue;
+        let score = baseScore;
+        if (rec.context && rec.context.length > 0) {
+          if (contextPresent(text, start, end, rec)) {
+            score = Math.min(1.0, score + (rec.contextBoost ?? 0.1));
+          } else if (rec.requireContext) {
+            continue;
+          }
+        }
+        const span = {
+          start,
+          end,
+          label: rec.label,
+          text: value,
+          source: "recognizer",
+          score: round4(score),
+        };
+        if (accepted.some((a) => overlaps(span, a))) continue;
+        accepted.push(span);
+      }
+    }
+  }
+  return accepted;
+}
+
+// ---------------------------------------------------------------------------
+// Score gate: per-label thresholds + needs-review mode (SDK 0.5.0)
+// ---------------------------------------------------------------------------
+
+/** The score gate for one label: its per-label override when set,
+    else the global threshold. */
+export function effectiveThreshold(label, globalThreshold, thresholds) {
+  if (thresholds && label in thresholds) return thresholds[label];
+  return globalThreshold;
+}
+
+function validateScoreOptions(options) {
+  if (options.thresholds) {
+    for (const [label, t] of Object.entries(options.thresholds)) {
+      if (!(t >= 0 && t <= 1)) {
+        throw new Error(
+          `threshold for ${JSON.stringify(label)} is ${t}, outside [0, 1]`,
+        );
+      }
+    }
+  }
+  if (
+    options.reviewMargin !== undefined &&
+    options.reviewMargin !== null &&
+    !(options.reviewMargin >= 0 && options.reviewMargin <= 1)
+  ) {
+    throw new Error(`reviewMargin ${options.reviewMargin} outside [0, 1]`);
+  }
+}
+
+/**
+ * Split merged entities into { kept, review } by score.
+ *
+ * Only spans carrying a score are gated — neural spans and recognizer
+ * spans. Spans WITHOUT a score (the checksum-gated rules layer,
+ * denylist injections) are deterministic by construction and always
+ * redact: a per-label threshold on "SSN" does not stop the SSN rule,
+ * and a threshold never turns a rule span into a review candidate.
+ *
+ * A scored span redacts when score >= its effective threshold
+ * (per-label override, else options.threshold, else
+ * DEFAULT_THRESHOLD). Below that, when reviewMargin is set, a span
+ * scoring at or above (threshold - reviewMargin) becomes a review
+ * candidate: NOT redacted, returned for a human to decide. Anything
+ * lower is dropped. With reviewMargin undefined (the default) the
+ * review list is always empty.
+ */
+export function partitionByScore(entities, options = {}) {
+  validateScoreOptions(options);
+  const kept = [];
+  const review = [];
+  const margin = options.reviewMargin;
+  const global = options.threshold ?? DEFAULT_THRESHOLD;
+  for (const e of entities) {
+    if (e.score === undefined || e.score === null) {
+      kept.push(e);
+      continue;
+    }
+    const eff = effectiveThreshold(e.label, global, options.thresholds);
+    if (e.score >= eff) {
+      kept.push(e);
+    } else if (
+      margin !== undefined &&
+      margin !== null &&
+      e.score >= eff - margin
+    ) {
+      review.push({
+        start: e.start,
+        end: e.end,
+        label: e.label,
+        text: e.text,
+        score: e.score,
+        source: e.source,
+      });
+    }
+  }
+  review.sort((a, b) => a.start - b.start);
+  return { kept, review };
+}
+
+// ---------------------------------------------------------------------------
+// Full scan
+// ---------------------------------------------------------------------------
+
+/**
+ * Full scan: rules + recognizers + (optional) neural entities, merged,
+ * allow/deny-processed, score-gated, with the redacted text and
+ * counts — the SDK's RedactionResult shape, plus the review list.
  *
  * @param {string} text
- * @param {Array} neuralEnts entities from the neural engine (may be [])
+ * @param {Array} neuralEnts entities from the neural engine (may be []);
+ *   pass UNGATED spans (predict with threshold 0) — the score gate
+ *   here applies the effective thresholds and review band.
+ * @param {object} [options] SDK RedactOptions (operator, salt,
+ *   allowlist, denylist, denyLabel, recognizers, thresholds,
+ *   reviewMargin) plus the extension's `threshold` global gate.
  * @returns {{redacted: string, entities: Array, mapping: object,
- *   counts: object, engine: string}}
+ *   counts: object, engine: string, review: Array}}
  */
-export function scanAll(text, neuralEnts = []) {
-  const entities = mergeEntities(rulesScan(text), neuralEnts);
-  const { redacted, mapping } = applyPlaceholders(text, entities);
+export function scanAll(text, neuralEnts = [], options = {}) {
+  const merged = mergeEntities(
+    rulesScan(text),
+    neuralEnts,
+    recognizerSpans(text, options.recognizers ?? []),
+  );
+  const processed = processEntities(text, merged, options);
+  const { kept, review } = partitionByScore(processed, options);
+  const { redacted, mapping } = applyPlaceholders(text, kept, options);
   const counts = {};
-  for (const e of entities) counts[e.label] = (counts[e.label] ?? 0) + 1;
+  for (const e of kept) counts[e.label] = (counts[e.label] ?? 0) + 1;
   return {
     redacted,
-    entities,
+    entities: kept,
     mapping,
     counts,
     engine: neuralEnts.length > 0 ? "rules+onnx" : "rules",
+    review,
   };
 }
 

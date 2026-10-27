@@ -37,6 +37,31 @@
         </label>
         <label class="row">
           <span>
+            Flag borderline detections for review
+            <small>
+              Detections scoring just below the threshold are held back
+              instead of dropped: the review panel lists them and you
+              decide per item before the upload proceeds. Off by
+              default.
+            </small>
+          </span>
+          <input type="checkbox" id="review-enabled" />
+        </label>
+        <label class="row" id="review-margin-row">
+          <span>
+            Review band width
+            <small>
+              How far below the threshold a detection can score and
+              still be flagged for review.
+            </small>
+          </span>
+          <span class="threshold-ctl">
+            <input type="range" id="review-margin" min="0.05" max="0.4" step="0.05" />
+            <strong id="review-margin-value">0.15</strong>
+          </span>
+        </label>
+        <label class="row">
+          <span>
             Download the model automatically
             <small>
               On the first scan, fetch the model from Hugging Face
@@ -46,6 +71,93 @@
           </span>
           <input type="checkbox" id="auto-download" />
         </label>
+      </section>
+
+      <section>
+        <h2>Redaction style</h2>
+        <label class="row">
+          <span>
+            Replacement style
+            <small>
+              How identifiers are rendered in redacted copies.
+              Numbered placeholders are reversible (the original text
+              is recoverable from the placeholder map); the other
+              styles are not.
+            </small>
+          </span>
+          <select id="operator">
+            <option value="numbered">Numbered — [SSN_1]</option>
+            <option value="label">Label — &lt;SSN&gt;</option>
+            <option value="mask">Mask — ***-**-6789</option>
+            <option value="hash">Hash — consistent pseudonym</option>
+            <option value="remove">Remove — delete the text</option>
+          </select>
+        </label>
+        <label class="row" id="salt-row">
+          <span>
+            Hash salt
+            <small>
+              With the hash style, the same value always becomes the
+              same token, so redacted documents still join up. Use a
+              secret salt: unsalted hashes of low-entropy values
+              (like SSNs) can be reversed by dictionary attack.
+            </small>
+          </span>
+          <input type="text" id="salt" placeholder="e.g. a long random phrase" />
+        </label>
+        <div class="row">
+          <span>
+            Per-label thresholds
+            <small>
+              Override the global threshold for specific labels (for
+              example, NAME_PATIENT at 0.50, or a custom recognizer
+              label). Labels not listed here use the global threshold.
+              Rules-based detections (SSN, cards, ...) have no score
+              and always redact.
+            </small>
+          </span>
+        </div>
+        <div id="threshold-rows"></div>
+        <div class="buttons">
+          <button id="threshold-add" type="button">Add label override</button>
+        </div>
+      </section>
+
+      <section>
+        <h2>Allowlist and denylist</h2>
+        <p class="small">
+          One term per line, matched case-insensitively. Allowlisted
+          terms are never redacted — a term protects exactly the value
+          it names. Denylisted terms are always redacted (labeled
+          CUSTOM), even if the model and rules miss them; a term on
+          both lists is redacted.
+        </p>
+        <label class="list-label" for="allowlist">Allowlist — never redact</label>
+        <textarea id="allowlist" rows="4" spellcheck="false"
+          placeholder="Springfield General Hospital"></textarea>
+        <label class="list-label" for="denylist">Denylist — always redact</label>
+        <textarea id="denylist" rows="4" spellcheck="false"
+          placeholder="Project Nightingale"></textarea>
+        <div class="buttons">
+          <button id="lists-save" type="button">Save lists</button>
+          <span id="lists-saved" class="saved-note"></span>
+        </div>
+      </section>
+
+      <section>
+        <h2>Custom recognizers</h2>
+        <p class="small">
+          Your own patterns, matched alongside the built-in detection.
+          Each recognizer gives its matches a label and a score; the
+          score is gated by the threshold like the model's. Context
+          words boost the score when one appears near a match. A
+          validator (checksum) can gate matches so only values that
+          pass are flagged. Invalid recognizers are not saved.
+        </p>
+        <div id="recognizer-rows"></div>
+        <div class="buttons">
+          <button id="recognizer-add" type="button">Add recognizer</button>
+        </div>
       </section>
 
       <section>

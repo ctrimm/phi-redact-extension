@@ -109,3 +109,95 @@ input[type="text"] {
   color: #6b7280;
   font-size: 13px;
 }
+select {
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  padding: 7px 10px;
+  font-size: 13px;
+  background: #fff;
+  flex: none;
+}
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  margin: 4px 0 10px;
+}
+.list-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 8px;
+}
+.saved-note {
+  font-size: 12.5px;
+  color: #047857;
+}
+.trow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 0;
+}
+.trow input[type="text"] {
+  flex: 1;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.trow input[type="number"] {
+  width: 76px;
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  padding: 7px 10px;
+  font-size: 13px;
+}
+.rec {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin: 10px 0;
+}
+.rec .grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 14px;
+}
+.rec label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #374151;
+}
+.rec label input,
+.rec label select,
+.rec label textarea {
+  margin-top: 4px;
+  font-weight: 400;
+}
+.rec .wide {
+  grid-column: 1 / -1;
+}
+.rec .check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 400;
+}
+.rec .check input {
+  margin: 0;
+}
+.rec .err {
+  color: #b91c1c;
+  font-size: 12.5px;
+  line-height: 1.45;
+  margin-top: 8px;
+  white-space: pre-wrap;
+}
+.rec .rec-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
